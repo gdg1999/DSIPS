@@ -1,0 +1,8 @@
+numpy
+pysindy
+scipy
+matplotlib
+matlab
+scikit-learn
+sympy
+control
