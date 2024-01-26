@@ -2,7 +2,7 @@ numpy
 pysindy
 scipy
 matplotlib
-matlab
+matlab engine (not necessary)
 scikit-learn
 sympy
 control
