@@ -32,7 +32,7 @@ def generate_subplots(rows, cols, subplot_data, Length):
         ax.ticklabel_format(style='sci', scilimits=(-1,2),axis='y')
         ax.yaxis.get_offset_text().set_fontsize(23)
         # ax.set_xlabel("t(s)",fontsize=22)
-        
+        # if you wanna dash line to seperate the training data and the test data, use this:
         # ax.axvspan(xmin=xmin,xmax=xmax,facecolor=color_dict["琉璃"][0],alpha=0.2)
         # ax.axvline(x=xmin, ls='-.')
         ax.set_xlim(0, xmax)
@@ -44,7 +44,9 @@ def generate_subplots(rows, cols, subplot_data, Length):
                     linewidth=linewidth[len_y],
                     label=label_[len_y]
                     )
-        axs[1,2].legend(fontsize=25, frameon=False)
+        # if you wanna legend at a specific location, use this:
+        # axs[1,2].legend(fontsize=25, frameon=False)
+
 
         fig.supxlabel('Time(s)',fontsize=25)
         fig.tight_layout()
