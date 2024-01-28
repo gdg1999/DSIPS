@@ -4,6 +4,7 @@
  电力系统模型实时辨识软件
 
 版本：2023年12月
+
 Version 2023.12
 
 - 分支一：主分支，目前开发的分支; (Main: it will be updated;)
@@ -38,6 +39,7 @@ Then, a system can be trained and analyzed.
 更多功能正在研发，敬请期待！
 
 联系人Duange Guo
+
 详细理论与信息可关注：
 https://space.bilibili.com/7829899?spm_id_from=333.1007.0.0
 
