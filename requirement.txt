@@ -6,3 +6,4 @@ matlab engine (not necessary)
 scikit-learn
 sympy
 control
+pandas
