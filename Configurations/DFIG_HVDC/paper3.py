@@ -6,28 +6,8 @@ Created on Thu Oct 12 16:50:48 2023
 """
 
 """
-This is the Program for DFIG System model identification
-based on DATA driven methods called SINDy
-
-The whole procedures are divided into three parts:
-    data collection for x dot
-    library construction
-    constraint and optimization
-
-each part has its own defined function
-which is easy to reuse for different blocks
-
-more advanced function of the program
-1.noise for the initial data, so necessary to use appropriate difference method
-2.auto-encoder for high dimension states
-3.constraints for each physical blocks, so proper optimization method is used
-4.model coefficient return to form the whole system model
-5.data obtained from Matlab in real time so that can update the model lively
-
-problem exists
-1.block6 and 8 don't work well
-2.cannot solve noisy data
-3.missing the function of auto encoder
+Main Function for Paper: Model Identification of Grid-following System for
+Stability Evaluation with Transient Data
 """
 
 from Algo import System_Build as SB
@@ -49,13 +29,12 @@ color_dict = {
 
 
 ########################################################
-#################   DFIG operation   ##################
+###############   DFIG & HVDC Operation   ##############
 ########################################################
 
 Block_num = 24
 Algebra_num = 17
 
-# print("Now configure the files1...\n")
 ### Algorithm Parameters
 Time_windows = 0.2       # [s] simulation time
 Shift_windows = 0.09      # [s] simulation time
@@ -82,7 +61,7 @@ for num in range(Block_num + Algebra_num):
 first1_ana = Model_Analysis.Analysis(first1, ['S1UD', 'S1UQ', 'S2UD', 'S2UQ'], ['P_right', 'Qright', 'P_left', 'Qleft'])
 first1_ana.Jacobian_mat()
 ret = first1_ana.Damp_analysis()
-filter_poles = first1_ana.Plot_range_poles(ret[2], [-5,0], [-500,500])
+filter_poles = first1_ana.Plot_range_poles(ret[2], [-2000,0], [-500,500])
 
 
 A = first1_ana.state_space.A
@@ -108,11 +87,9 @@ ct.bode(ct.ss(A,B,C,D)[0,0], dB=True, Hz =True)
 
 print("Now coefficient analysis:\n")
 
-block_num_dominant = [1,2,3,6,7,8,9,10,11,12,13]
-# train_series = [[1],[1,2],[1,2,3],[5]]
-train_series = [[1]]
-# block_num_dominant = [1,2]
-first1_ana.Coefficient_analysis(block_num_dominant, train_series)
+block_num_dominant = [16,17,18,20]
+train_series = [[1],[1,2],[1,2,3]]
+first1.Coefficient_analysis(block_num_dominant, train_series)
 
 print("Now draw the picture:\n")
 Length = int(0.02 * 1e5 - 1)
@@ -121,25 +98,7 @@ win_num = 1
 first1.Figure_plot(Length, win_num)
 
 first1.Figure_paper_X(Length, [14,15,33,34], 1, [2,2])
-first1.Figure_paper_R(Length, [1,3,5,7], 1, [2,2])
+first1.Figure_paper_R(Length, [1,3,5,7,16,17,18,20,23], 1, [3,3])
 
 first1.Figure_paper_X(Length, [2,1], 1, [1,2])
 first1.Figure_paper_R(Length, [1,2], 1, [2,1])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
