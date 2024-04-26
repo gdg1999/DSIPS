@@ -170,8 +170,91 @@ class Connection():
         return (self.A, self.B, self.C, self.D, self.X, self.U, self.Y)
     
     
-    def cross(self, sys2):
-        pass
+    def cross(self, sys2, sys3, sys4):
+        """
+        The append operation
+
+        Parameters
+        ----------
+        sys1 : system1, default: the original one
+
+        sys2 : system2, default: the appended one
+        
+        sys3 : system3, default: the appended one
+        
+        sys4 : system4, default: the appended one
+
+        Returns
+        -------
+        Tuple: the integrated system
+
+        """
+        
+        A11 = self.A
+        B11 = self.B
+        C11 = self.C
+        D11 = self.D
+        X11 = self.X
+        U1  = self.U
+        Y11 = self.Y
+        
+        A12 = sys2.A
+        B12 = sys2.B
+        C12 = sys2.C
+        D12 = sys2.D
+        X12 = sys2.X
+        U2  = sys2.U
+        Y12 = sys2.Y
+        
+        A21 = sys3.A
+        B21 = sys3.B
+        C21 = sys3.C
+        D21 = sys3.D
+        X21 = sys3.X
+        U1  = sys3.U
+        Y21 = sys3.Y
+        
+        A22 = sys4.A
+        B22 = sys4.B
+        C22 = sys4.C
+        D22 = sys4.D
+        X22 = sys4.X
+        U2  = sys4.U
+        Y22 = sys4.Y
+    
+        self.U  = U1  + U2
+        self.X1 = X11 + X12
+        self.X2 = X21 + X22
+        self.X  = X1  + X2
+        self.Y1 = Y11 + Y12
+        self.Y2 = Y21 + Y22
+        self.Y  = Y1   + Y2
+        # constructing the state equation of the new system
+        self.A1 = block_diag(A11, A12)
+    
+        self.B1 = block_diag(B11, B12)
+
+        self.C1 = block_diag(C11, C12)
+
+        self.D1 = block_diag(D11, D12)
+        
+        self.A2 = block_diag(A21, A22)
+    
+        self.B2 = block_diag(B21, B22)
+
+        self.C2 = block_diag(C21, C22)
+
+        self.D2 = block_diag(D21, D22)
+        
+        self.A = block_diag(A1, A2)
+    
+        self.B = np.concatenate((B1, B2), axis=0)  # with col
+
+        self.C = np.concatenate((C1, C2), axis=1)  # with row
+
+        self.D = np.add(D1, D2)
+        
+        return (self.A, self.B, self.C, self.D, self.X, self.U, self.Y)
     
     
     def shunt(self, sys2):
@@ -209,7 +292,7 @@ class Connection():
         
         self.X = X1 + X2
         self.U = self.U
-        self.Y = Y1  # its output should be the sum of y1 and y2 !
+        self.Y = Y1 + Y2 # its output should be the sum of y1 and y2 !
         
         self.A = block_diag(A1, A2)
     
@@ -258,10 +341,11 @@ class Connection():
         self.U = U1
         self.Y = Y2
         
-        self.A = np.matmul(A2, A1)
-        self.B = np.matmul(A2, B1) + B2
-        self.C = np.matmul(C1, A2) + C2
-        self.D = np.matmul(C1, B2) + D2 + D1
+        self.A = np.block([[A1, np.zeros_like(A1)],[B2@C1, A2]])
+        self.B = np.block([[B1], [B2@D1]])
+        self.C = np.block([D2@C1, C2])
+        self.D = D2@D1
+       
         
         return (self.A, self.B, self.C, self.D, self.X, self.U, self.Y)
     

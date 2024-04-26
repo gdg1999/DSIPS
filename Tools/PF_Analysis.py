@@ -11,153 +11,170 @@ using python instead of matlab will be more convinent!
 
 """
 
-
 import numpy as np
+import pandas as pd
 
 
-class PF_Analysis():
-    """
+class PF_Analysis:
+    def __init__(self, A, X):
+        """
+        Obtain initial states
+        """   
+        self.A = A
+        self.X = X
     
-    """
-
-
-
-def Auto_system(order):
-    
-   pass
-
-
-
-def feedback(A1, B1, C1, D1, A2, B2, C2, D2):
-        # 计算反馈连接后的状态方程
-        A = np.block([[A1, -B1@D2@C1],[B2@C1, A2]])
-        B = np.block([[B1],[B2@D1]])
-        C = np.block([D2@C1, C2])
-        D = D2@D1
         
-        return A, B, C, D
+    def calculate_eigenvalues(self):
+        eigenvalues, _ = np.linalg.eig(self.A)
+        print("特征值矩阵:")
+        print(eigenvalues)
+        return eigenvalues
+    
+    
+    def eigen_vector_mode(self):
+        """
+        Obtain the right/left eigenvector
+        """
+        _, eigenvectors = np.linalg.eig(self.A)
+        # Output right eigenvectors matrix
+        print("\n右特征向量矩阵:")
+        print(eigenvectors)
+        # Calculate left eigenvectors matrix
+        left_eigenvectors = np.linalg.inv(eigenvectors)
+        # Output left eigenvectors matrix
+        print("\n左特征向量矩阵:")
+        print(left_eigenvectors)  
+        return eigenvectors
+    
+    
+    def compute_observability(self,eigenvectors):
+         # constructing observability matrix
+         D = np.transpose(eigenvectors)
+         for i in range(len(eigenvalues)):
+             D[i] = D[i] * np.exp(eigenvalues[i])    
+         # calculate the rank of a natrix
+         rank = np.linalg.matrix_rank(D)
+         # judging observability
+         if rank == len(eigenvalues):
+             print("The system is observable.")
+         else:
+             print("The system is not observable.")
+         return D
+     
+        
+    def controllability(self,eigenvectors,eigenvalues):
+        # Transpose the eigenvalue vector matrix
+        eigenvectors_T = np.transpose(eigenvectors)
+        # Calculate the controllability matrix C
+        C = np.matmul(np.matmul(eigenvectors_T, self.A), eigenvectors)
+        # Extracting the Real Part of eigenvalues
+        real_part = np.real(eigenvalues)
+        # Check if the real parts of all eigenvalues are not 0
+        if np.any(real_part == 0):
+            print("System not completely controllable.")
+        # Check the rank of controllability matrix C
+        rank_C = np.linalg.matrix_rank(C)
+        # Obtain the dimension of matrix A
+        n = self.A.shape[0]      
+        # Determine if the system is controllable
+        if rank_C == n:
+            print("System is completely controllable.")
+        else:
+            print("System is not completely controllable.")
+        return C
+    
+    
+    def PF(self, eigenvectors):
+        result = np.zeros((len(self.A), len(self.A)))
+        for i in range(len(self.A)):
+            for j in range(len(self.A)):  
+                result[i][j] = abs(np.dot(self.A[:, i], eigenvectors[:, j]))
+    
+        
+        result_normalized = result / result.sum(axis=0)
 
-# 测试
-A1 = np.array([[1, 2],[3, 4]])
-B1 = np.array([[5],[6]])
-C1 = np.array([[7, 8]])
-D1 = np.array([[9]])
-state_str1 = ['x11', 'x12']  # information related to this system1
-input_str1 = ['u11']
-output_str1 = ['y11']
+        sorted_result = np.sort(-result_normalized,axis=0)
+        sorted_result=np.abs(sorted_result)
+        print(result_normalized)
+        print(sorted_result)
+        return sorted_result
+      
+    def Residue(self,D,C):
+         """
+         Calculate the residue
 
+         Returns
+         -------
+         Res : TYPE
+             DESCRIPTION.
 
-A2 = np.array([[10, 11],[12, 13]])
-B2 = np.array([[14],[15]])
-C2 = np.array([[16, 17]])
-D2 = np.array([[18]])
-state_str1 = ['x21', 'x22']  # information related to this system2
-input_str1 = ['u21']
-output_str1 = ['y21']
+         """
+         Res=[]
+         # Obtain the dimension of matrix A
+         n = self.A.shape[0]        
+         for k in range(n):
+             Res.append(D*C)
+         for value in range:
+             print(value)
+         return Res
+            
+     
+    def toExcel(self, eigenvalues, eigenvectors,sorted_result, filename):
+        """
+        Write the results into excel
 
-A, B, C, D = feedback(A1, B1, C1, D1, A2, B2, C2, D2)
+        Returns
+        -------
+        None.
+        """
 
-print("A = ", A)
-print("B = ", B)
-print("C = ", C)
-print("D = ", D)
+        # Create an Excel writer object
+        writer = pd.ExcelWriter(filename, engine='xlsxwriter')
 
+        # Write the eigenvalue matrix into a worksheet in an Excel file
+        df_eigenvalues = pd.DataFrame({'特征值': eigenvalues})
+        df_eigenvalues.to_excel(writer, index=False, sheet_name='特征值矩阵')
+
+        # Write the right eigenvector matrix into a worksheet in an Excel file
+        df_eigenvectors = pd.DataFrame(eigenvectors)
+        df_eigenvectors.to_excel(writer, index=False, sheet_name='右特征向量矩阵')
+
+        # Calculate and sort the participation factor matrix for each state variable
+        # Sort indices in descending order of participation factors
+        
+
+        # Create initial participation factor dataframe
+        df_participation = pd.DataFrame(sorted_result,index=['mode'+str(i+1)for i in range(len(sorted_result))])
+
+        # Replace the column names with state1, state2, ...
+        df_participation.columns = ['state' + str(i + 1) for i in range(len(df_participation.columns))]
+        frequencies= np.sqrt(np.abs(eigenvalues))/(2*np.pi)
+        damping_ratios = -np.real(eigenvalues) / np.abs(eigenvalues)
+        df_participation['振荡频率']=frequencies
+        df_participation['阻尼']=damping_ratios
  
-def connect_systems(A1, B1, C1, D1, A2, B2, ):
-    
-    sys1.A
-    sys1.B
-    sys1.X
-    sys1.U
-    
-    
-    
-    return A, B, C, D, X, U, Y
+        # Save the participation factor matrix into a worksheet in an Excel file
+        df_participation.to_excel(writer, index=True, sheet_name='参与因子归一化矩阵')
+
+        # Save the Excel file
+        writer.close()
+
+        
+# Create objects to perform modal analysis
+A = np.array([[0, 2], [-4, -6]])
+X = ['state1','state2']
+pf_analysis = PF_Analysis(A,X)
+eigenvalues = pf_analysis.calculate_eigenvalues()
+eigenvectors = pf_analysis.eigen_vector_mode()
+
+sorted_result=pf_analysis.PF(eigenvectors)
+pf_analysis.toExcel(eigenvalues,eigenvectors,sorted_result,'output.xlsx')
+D=pf_analysis.compute_observability(eigenvectors)
+C=pf_analysis.controllability(eigenvectors,eigenvalues)
 
 
-def shunt(A1,B1,C1,D1,A2,B2,C2,D2):
-    # 确定新系统的状态方程维度
-    n1, m1 = B1.shape
-    n2, m2 = B2.shape
-    n = n1 + n2
-    m = m1 + m2
-
-    # 构建新系统的状态方程
-    A = np.zeros((n, n))
-    A[:n1, :n1] = A1
-    A[n1:, n1:] = A2
-
-    B = np.zeros((n, m))
-    B[:n1, :m1] = B1
-    B[n1:, m1:] = B2
-
-    C = np.zeros((m, n))
-    C[:m1, :n1] = C1
-    C[m1:, n1:] = C2
-
-    D = np.zeros((m, m))
-    D[:m1, :m1] = D1
-    D[m1:, m1:] = D2
-
-    return A, B, C, D
-# 测试
-A1 = np.array([[1, 2], [3, 4]])
-B1 = np.array([[5], [6]])
-C1 = np.array([[7, 8]])
-D1 = np.array([[9]])
-A2 = np.array([[10]])
-B2 = np.array([[11]])
-C2 = np.array([[12]])
-D2 = np.array([[13]])
-A, B, C, D = shunt(A1, B1, C1, D1, A2, B2, C2, D2)
-print("A =",A)
-print("B =",B)
-print("C =",C)
-print("D =",D)
-   
 
 
-def series(A1,B1,C1,D1,A2,B2,C2,D2):
-    A = np.matmul(A2, A1)
-    B = np.matmul(A2, B1) + B2
-    C = np.matmul(C1, A2) + C2
-    D = np.matmul(C1, B2) + D2 + D1
-    return A, B, C, D
 
-# 测试
-A1 = np.array([[1, 2], [3, 4]])
-B1 = np.array([[5], [6]])
-C1 = np.array([[7, 8]])
-D1 = np.array([[9]])
 
-A2 = np.array([[10, 11], [12, 13]])
-B2 = np.array([[14], [15]])
-C2 = np.array([[16, 17]])
-D2 = np.array([[18]])
 
-A, B, C, D = series(A1, B1, C1, D1, A2, B2, C2, D2)
-
-print("A =", A)
-print("B =", B)
-print("C =", C)
-print("D =", D)
-
-def happy(A, B, C, D, X, U, Y):
-    """
-    intro
-    """
-    
-    # Mode Shapes
-    Mode
-    
-    # Participation Factors
-    
-    PF
-    
-    # Residues
-    
-    Res
-    
-    
-    return Mode, PF, Res
-    
