@@ -20,6 +20,7 @@ from scipy.io import savemat
 import os
 import re
 from functools import partial
+import pandas as pd
 import numpy as np
 import Configurations as C  # configuration files corresponding to your simulink
 
@@ -392,3 +393,41 @@ class System(object):
         CA.Coefficients_plot(self.Model_coefficient_stds, block_num_dominant)
     
     
+    def Info_output(self, path):
+        """
+        Output some information to designated file root
+        Information including block training cost time, in excel form
+        block training data and prediction data for drawing, in mat form
+        """
+        
+        if not os.path.exists(path):  # prepare for the folder in advance
+            os.makedirs(path)
+        
+        TimeList = []
+        BlockName = []
+        for blocks in self.Blocks:
+            TimeList.append(blocks.time)
+            BlockName.append("Block_"+f"{blocks.name}")
+        df = pd.DataFrame(list(zip(BlockName, TimeList)), columns=['Name', 'Time(s)'])
+        print("Output block cost time in excel...")
+        fileName = "Cost_time.xlsx"
+        full_file_path = os.path.join(path, fileName)
+        df.to_excel(full_file_path, index=False)
+        print("Excel file Cost_time.xlsx has been created.")
+        print()
+        
+        # Blocks_data = {}
+        # Block_dic = {}
+        # for blocks in self.Blocks:
+        #     block_order = blocks.name
+        #     (Block_dic["Time"], Block_dic["X_predicted"], Block_dic["X_real"]) = self.__paper_result_real([block_order],
+        #                                                                  1,  # for easy use
+        #                                                                  int(self.Time_windows*(1/self.dt)-1),
+        #                                                                  self.t_test)
+
+        #     Blocks_data[f"{block_order}"] = Block_dic.copy()  # the real value instead of the address
+        
+        # print("Output real data for comparing...")
+        # file_name = 'SystemSimulation.mat'
+        # full_file_path = os.path.join(path, file_name)
+        # savemat(full_file_path, Blocks_data)  # in a dic way

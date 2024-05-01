@@ -22,9 +22,9 @@ color_dict = {
 
 
 Block_num = 13
-# Algebra_num = 10
+Algebra_num = 10
 
-Algebra_num = 0
+# Algebra_num = 0
 
 
 ### Algorithm Parameters
@@ -36,7 +36,7 @@ Shift_windows = 0.01      # [s] simulation time
 # Square = [5,10,15,20,25,30]
 
 WindFarmNum = [5]
-Square = [5, 10, 15]
+Square = [5, 10]
 
 # Iterate over each combination of elements from WindFarmNum and Square
 for wind_num in WindFarmNum:
@@ -67,11 +67,14 @@ for wind_num in WindFarmNum:
         Transient.Batch_output(r"C:\Users\29639\Desktop\研二下研究\paper4电工\code\PythonData\Para_"
                                +f"{wind_num}"+"_"+f"{square_num}")
         print()
+        Transient.Info_output(r"C:\Users\29639\Desktop\研二下研究\paper4电工\code\PythonData\Para_"
+                               +f"{wind_num}"+"_"+f"{square_num}")
+        print()
 
 print("Step 5 Finished, Please use Matlab next.")
 
         
-        
+# Transient.Figure_paper_R(1000, [1,2,3,4], 1, [2,2])
         
         
         

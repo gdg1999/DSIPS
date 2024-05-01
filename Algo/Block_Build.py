@@ -58,6 +58,7 @@ class Block(object):
         self.constraint = None  # a Constraint class for the block
         self.identified = None  # identified model, a pysindy class
         self.Midentified_dict = {}  # lots of identified model, for more advanced use
+        self.time = 0  # time for single identification
         
     
     def Data_generation(self):
@@ -233,6 +234,7 @@ class Block(object):
 
         model_Block.print()
         print(f"{end - start} cost in thie block\n")  # print the time cost  
+        self.time = end - start
         self.identified = model_Block
 
 
