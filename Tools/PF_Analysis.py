@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 
 
-class PF_Analysis:
+class PF_Analysis():
     def __init__(self, A, X):
         """
         Obtain initial states

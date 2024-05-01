@@ -22,7 +22,9 @@ color_dict = {
 
 
 Block_num = 13
-Algebra_num = 10
+# Algebra_num = 10
+
+Algebra_num = 0
 
 
 ### Algorithm Parameters
@@ -34,7 +36,7 @@ Shift_windows = 0.01      # [s] simulation time
 # Square = [5,10,15,20,25,30]
 
 WindFarmNum = [5]
-Square = [5]
+Square = [5, 10]
 
 # Iterate over each combination of elements from WindFarmNum and Square
 for wind_num in WindFarmNum:
@@ -61,8 +63,8 @@ for wind_num in WindFarmNum:
         for num in range(Block_num + Algebra_num):
             Transient.Blocks[num].Error_analysis()  # Error Analysis
         
-        print("Now equations output:\n")
-        Transient.Batch_output()
+        print("\nNow equations output:\n")
+        # Transient.Batch_output()
         
         
         

@@ -151,6 +151,12 @@ class nonlinear_constraint(block_constraint):
                 # one group
                 eq_name = [i for i, x in enumerate(self.states) if x == self.constraints_assign[constraint_num][0]]  # the equation
                 feature_name = [i for i, x in enumerate(self.fea_list) if x == self.constraints_assign[constraint_num][1]]  # the feature
+                
+                if feature_name == []:
+                    print("Check your feature list:\n")
+                    print(self.fea_list)
+                    print("\n")
+                
                 # follow the name, instead of the order
                 self.constraint_lhs[constraint_num, self.n_features*eq_name[0] + feature_name[0]] = 1
                 # assign the value unit to corresponding features
@@ -163,6 +169,11 @@ class nonlinear_constraint(block_constraint):
                 
                 eq_name2 = [i for i, x in enumerate(self.states) if x == self.constraints_combi[constraint_num-len(self.constraints_assign)][2]]
                 feature_name2 = [i for i, x in enumerate(self.fea_list) if x == self.constraints_combi[constraint_num-len(self.constraints_assign)][3]]
+                
+                if feature_name1 == [] or feature_name2 == []:
+                    print("Check your feature list:\n")
+                    print(self.fea_list)
+                    print("\n")
                 
                 self.constraint_lhs[constraint_num, self.n_features*eq_name1[0] + feature_name1[0]] = 1
                 self.constraint_lhs[constraint_num, self.n_features*eq_name2[0] + feature_name2[0]] = 1

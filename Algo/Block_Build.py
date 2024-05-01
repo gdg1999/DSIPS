@@ -117,15 +117,18 @@ class Block(object):
             # uses all the input variables
             inputs_temp = np.tile([0, 1, 2, 3], 2)
             inputs_per_library = np.reshape(inputs_temp, (2, 4))
-            inputs_per_library[0, 0] = 0
-            inputs_per_library[0, 1] = 0
-            inputs_per_library[1, 2] = 1
-            inputs_per_library[1, 3] = 1
+            inputs_per_library[0, 0] = 1
+            # inputs_per_library[0, 1] = 0
+            inputs_per_library[1, 1] = 0
+            inputs_per_library[1, 2] = 0
+            inputs_per_library[1, 3] = 0
+            # [1 1 2 3; Identity Library with x1, u0, u1
+            #  0 0 0 0] Fourier Library  with x0
             # Tensor all the polynomial and Fourier library terms together
             tensor_array = [[1, 1]]
             # Initialize this generalized library, all the work hidden from the user!
             self.Lib = ps.GeneralizedLibrary([identity_library, fourier_library], 
-                                                        tensor_array=tensor_array, exclude_libraries=[1],
+                                                        tensor_array=tensor_array, exclude_libraries=[1], # exclude Fourier
                                                         inputs_per_library=inputs_per_library)
         
         if len(self.Libindex[0]) == 2:

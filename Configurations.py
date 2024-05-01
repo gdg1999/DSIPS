@@ -50,7 +50,10 @@ constraints_assign4 = [('pVdc_averaged','x0_dot',1),
                         ('pVdc_averaged','x0x0_dot',-1),
                         ('pVdc_averaged','x0',0),
                         ('pVdc_averaged','u0_dot',0),
-                        ('pVdc_averaged','u1_dot',0)]
+                        ('pVdc_averaged','u1_dot',0),
+                        ('pVdc_averaged','u0x0_dot',0),
+                        ('pVdc_averaged','u1x0_dot',0),
+                        ('pVdc_averaged','x0u1_dot',0)]
 constraints_combi4 = [('pVdc_averaged','u0','pVdc_averaged','u1', 0)]
 # constraints_assign4 = []
 # constraints_combi4 = []
@@ -90,28 +93,38 @@ Ident7 = 'L'
 states8 = ['ptheta_pll_averaged', 'pRPLL_PI_averaged']
 inputs8 = ['UD_averaged', 'UQ_averaged']
 # constraints_assign8 = [('ptheta_pll_averaged','u0',0),
-#                        ('ptheta_pll_averaged','u1',0),
-#                        ('ptheta_pll_averaged','x1',1),
-#                        ('ptheta_pll_averaged','x0 sin(1 x0)',0),
-#                        ('ptheta_pll_averaged','x0 cos(1 x0)',0),
-#                        ('ptheta_pll_averaged','x0 sin(1 x1)',0),
-#                        ('ptheta_pll_averaged','x0 cos(1 x1)',0),
-#                        ('pRPLL_PI_averaged','x0',0),
+#                         ('ptheta_pll_averaged','u1',0),
+#                         ('ptheta_pll_averaged','x1',1),
+#                         ('ptheta_pll_averaged','x0 sin(1 x0)',0),
+#                         ('ptheta_pll_averaged','x0 cos(1 x0)',0),
+#                         ('ptheta_pll_averaged','x0 sin(1 x1)',0),
+#                         ('ptheta_pll_averaged','x0 cos(1 x1)',0),
+#                         ('pRPLL_PI_averaged','x0',0),
 #                         ('pRPLL_PI_averaged','u0',0),
 #                         ('pRPLL_PI_averaged','u1',0),
 #                         ('pRPLL_PI_averaged','x0 sin(1 x0)',0),
 #                         ('pRPLL_PI_averaged','x0 cos(1 x0)',0),
 #                         ('pRPLL_PI_averaged','x0 sin(1 x1)',0),
 #                         ('pRPLL_PI_averaged','x0 cos(1 x1)',0),
-#  ]
-constraints_assign8 = [('ptheta_pll_averaged','pRPLL_PI_averaged',1)]
+#   ]
+constraints_assign8 = [('ptheta_pll_averaged','u0',0),
+                        ('ptheta_pll_averaged','u1',0),
+                        ('ptheta_pll_averaged','x1',1),
+                        ('ptheta_pll_averaged','x1 sin(1 x0)',0),
+                        ('ptheta_pll_averaged','x1 cos(1 x0)',0),
+                        ('pRPLL_PI_averaged','x1',0),
+                        ('pRPLL_PI_averaged','u0',0),
+                        ('pRPLL_PI_averaged','u1',0),
+                        ('pRPLL_PI_averaged','x1 sin(1 x0)',0),
+                        ('pRPLL_PI_averaged','x1 cos(1 x0)',0)]
+# constraints_assign8 = []
 constraints_combi8 = []
 # constraints_combi8 = [('ptheta_pll_averaged','u0 cos(1 x0)','ptheta_pll_averaged','u1 sin(1 x0)', 0),
 #                       ('pRPLL_PI_averaged','u0 cos(1 x0)','pRPLL_PI_averaged','u1 sin(1 x0)', 0)]
-bias8 = False
+bias8 = True
 Type8 = 'B'
-Ident8 = 'L'
-# Ident8 = 'S'
+# Ident8 = 'L'
+Ident8 = 'S'
 
 # Block9 --> PLL_gsc
 states9 = ['pGPLL_PI_averaged', 'gtheta_pll_averaged']
