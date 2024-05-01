@@ -36,7 +36,7 @@ Shift_windows = 0.01      # [s] simulation time
 # Square = [5,10,15,20,25,30]
 
 WindFarmNum = [5]
-Square = [5, 10]
+Square = [5, 10, 15]
 
 # Iterate over each combination of elements from WindFarmNum and Square
 for wind_num in WindFarmNum:
@@ -64,10 +64,12 @@ for wind_num in WindFarmNum:
             Transient.Blocks[num].Error_analysis()  # Error Analysis
         
         print("\nNow equations output:\n")
-        # Transient.Batch_output()
-        
-        
-        
+        Transient.Batch_output(r"C:\Users\29639\Desktop\研二下研究\paper4电工\code\PythonData\Para_"
+                               +f"{wind_num}"+"_"+f"{square_num}")
+        print()
+
+print("Step 5 Finished, Please use Matlab next.")
+
         
         
         

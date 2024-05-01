@@ -17,6 +17,9 @@ from Tools import PIC as pic
 from Tools import Data_Import as DI
 from Tools import Coefficient_Analysis as CA
 from scipy.io import savemat
+import os
+import re
+from functools import partial
 import numpy as np
 import Configurations as C  # configuration files corresponding to your simulink
 
@@ -104,7 +107,7 @@ class System(object):
                 self.Blocks.append(block_)  # append the block to the list
 
 
-    def __Equation_Matlab(self, A_, Item_, State_, Input_, Bnum):
+    def __Equation_Matlab(self, A_, Item_, State_, Input_, Bnum, path):
         """
         A_ is the coefficients of the block, array
         Item_ is the corresponding variable names, list
@@ -112,42 +115,89 @@ class System(object):
         Input is the input variables of the block, list
         Bnum is the block num we generate, int
         return nothing, but generate mat data files in the files
+        path is the root you write
 
         """
+        
+        if not os.path.exists(path):  # prepare for the folder in advance
+            os.makedirs(path)
+            
         print("===============")
         print(f"Block{Bnum}")
         eq_num = A_.shape[0] # to get the row of A
         states_num = A_.shape[1] # to get the column of A
         
-        if Item_[0] != '1':  # no bias
-            all_items = State_ + Input_
-        else:
-            Item_[0] = 'one'  # with bias
-            all_items = ['1'] + State_ + Input_
+        if self.Blocks[Bnum-1].Libindex[0] == 'L':
         
-        for eq in range(eq_num):
-            dic = {}
-            for item in range(states_num):
-                dic[Item_[item]] = []
-                if True:
-                    dic[Item_[item]].append(all_items[item])
-                dic[Item_[item]].append(A_[eq, item])
-            file_name = f'Block{Bnum}_eq{eq}.mat'
-            savemat(file_name, dic)  # in a dic way
-            print(f"eq{eq}-----------------")
-            print(dic)
+            if Item_[0] != '1':  # no bias
+                all_items = State_ + Input_
+            else:
+                Item_[0] = 'one'  # with bias
+                all_items = ['1'] + State_ + Input_
+            
+            for eq in range(eq_num):
+                dic = {}
+                for item in range(states_num):
+                    dic[Item_[item]] = []
+                    if True:
+                        dic[Item_[item]].append(all_items[item])
+                    dic[Item_[item]].append(A_[eq, item])
+                file_name = f'Block{Bnum}_eq{eq}.mat'
+                full_file_path = os.path.join(path, file_name)
+                savemat(full_file_path, dic)  # in a dic way
+                print(f"eq{eq}-----------------")
+                print(dic)
+        
+        else:
+            FeaList = self.Blocks[Bnum-1].constraint.fea_list
+            FeaListNum = len(FeaList)  
+            temp_fun = partial(self.__Equation_Matlab_Nonlinear,
+                               states=State_, inputs=Input_)
+            for eq in range(eq_num):
+                dic = {}
+                for item in range(FeaListNum):
+                    dic[FeaList[item]] = []
+                    fea_true = re.sub(r'([xu])(\d+)?(_dot)?',
+                                      temp_fun,
+                                      FeaList[item])
+                    dic[FeaList[item]].append(fea_true)
+                    dic[FeaList[item]].append(A_[eq, item])
+                file_name = f'Block{Bnum}_eq{eq}.mat'
+                full_file_path = os.path.join(path, file_name)
+                savemat(full_file_path, dic)  # in a dic way
+                print(f"eq{eq}-----------------")
+                print(dic)
     
     
-    def __Output_batch(self, Bnum, algebraic):
+    def __Equation_Matlab_Nonlinear(self, match, states, inputs):
+        """
+        transfer fea_list to true name
+        """
+        identifier = match.group(1) # Get the matched identifier (e.g., x0, u1)
+        index_match = match.group(2) # Get the number after the identifier
+        index = int(index_match) if index_match is not None else None
+        if identifier.startswith('x') and index is not None and 0 <= index < len(states):
+            name = states[index]
+        elif identifier.startswith('u') and index is not None and 0 <= index < len(inputs):
+            name = inputs[index]
+        else:
+            name = identifier
+        if match.group(3) is None:
+            return name
+        else:
+            return name + '_dot'
+
+    
+    def __Output_batch(self, Bnum, algebraic, path):
         A = eval(f"self.Blocks[{Bnum}].identified").coefficients()
         items = eval(f"self.Blocks[{Bnum}].identified").get_feature_names()
         if algebraic:
-            self.__Equation_Matlab(A, items, eval(f'C.states{Bnum+1}'), eval(f'C.dot{Bnum+1}_x'), Bnum+1)
+            self.__Equation_Matlab(A, items, eval(f'C.states{Bnum+1}'), eval(f'C.dot{Bnum+1}_x'), Bnum+1, path)
         else:
-            self.__Equation_Matlab(A, items, eval(f'C.states{Bnum+1}'), eval(f'C.inputs{Bnum+1}'), Bnum+1)
+            self.__Equation_Matlab(A, items, eval(f'C.states{Bnum+1}'), eval(f'C.inputs{Bnum+1}'), Bnum+1, path)
 
 
-    def Batch_output(self):
+    def Batch_output(self, path):
         """
         Together with function "Equation_Matlab" and "Output_batch",
         return the model to the Simulink for analysis
@@ -161,8 +211,8 @@ class System(object):
             if self.Blocks[block].type == 'B':
                 index = False
                 
-            self.__Output_batch(block, index)
-    
+            self.__Output_batch(block, index, path)
+
     
     def Figure_plot(self, Data_Length, win_num):
         """
