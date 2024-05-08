@@ -261,7 +261,7 @@ class System(object):
                 x_dot_predicted[f'self.Blocks[{b_num}].identified'] = list((predicted[:,0]))
                 x_dot_computed[f'self.Blocks[{b_num}].identified'] = list(computed)
             
-        return t_sub, x_dot_predicted, x_dot_computed
+        return (t_sub, x_dot_predicted, x_dot_computed)
 
 
     def __paper_result_real(self, block_num, train_num, Length, t_test):
@@ -293,7 +293,7 @@ class System(object):
             else:
                 print("Only Dynamic Equations Here")
 
-        return t_sub, x_predicted, x_real
+        return (t_sub, x_predicted, x_real)
     
     
     def __perform_paper_plot(self, Length, block_num_dot, train_num_dot, layout, dt, t_test):
@@ -369,6 +369,8 @@ class System(object):
         """
         
         (t_sub_dot, x_dot_predicted, x_dot_computed) = self.__perform_paper_plot(Data_Length, block_num, win_num, layout, self.dt, self.t_test)
+        
+        return (t_sub_dot, x_dot_predicted, x_dot_computed)
     
     
     def Figure_paper_R(self, Data_Length, block_num, win_num, layout):
@@ -377,7 +379,9 @@ class System(object):
         """
 
         (t_sub_real, x_predicted, x_real) = self.__perform_paper_plot_real(Data_Length, block_num, win_num, layout, self.t_test)
-    
+        
+        return (t_sub_real, x_predicted, x_real)
+
     
     def Coefficient_analysis(self, block_num_dominant, train_series):
         """
