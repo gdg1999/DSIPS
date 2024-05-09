@@ -32,8 +32,8 @@ Algebra_num = 10
 # WindFarmNum = [5,15,25]
 # Square = [5,10,15,20,25,30]
 
-WindFarmNum = [5]
-Square = [5]
+WindFarmNum = [25]
+Square = [30]
 
 # file root check
 directory = r"G:\paper4\PythonData"
@@ -54,7 +54,7 @@ for wind_num in WindFarmNum:
 
         m = r"G:\paper4\ExcelData\Operation_state_"+f"{file_name}"  # files root
         source = ('PowerFactory', m)
-        windows_num = 1
+        windows_num = 2
         print(f"Configure {file_name} Finished...\n")
         
         print("Small Transient")
@@ -76,8 +76,8 @@ for wind_num in WindFarmNum:
         
         dataplot1 = Transient1.Figure_paper_X(LengthTran, [22,23], win_numTran, [1,2])
         
-        CalTranP1 = dataplot1[2]['self.Blocks[21].identified']
-        CalTranQ1 = dataplot1[2]['self.Blocks[22].identified']
+        CalTranP1 = dataplot1[1]['self.Blocks[21].identified']
+        CalTranQ1 = dataplot1[1]['self.Blocks[22].identified']
         
         
         print("Fault Transient")
@@ -99,8 +99,8 @@ for wind_num in WindFarmNum:
         
         dataplot2 = Transient2.Figure_paper_X(LengthTran, [22,23], win_numTran, [1,2])
         
-        CalTranP2 = dataplot2[2]['self.Blocks[21].identified']
-        CalTranQ2 = dataplot2[2]['self.Blocks[22].identified']
+        CalTranP2 = dataplot2[1]['self.Blocks[21].identified']
+        CalTranQ2 = dataplot2[1]['self.Blocks[22].identified']
         
         print("After Fault")
         
@@ -121,8 +121,8 @@ for wind_num in WindFarmNum:
         
         dataplot3 = Transient3.Figure_paper_X(LengthTran, [22,23], win_numTran, [1,2])
         
-        CalTranP3 = dataplot3[2]['self.Blocks[21].identified']
-        CalTranQ3 = dataplot3[2]['self.Blocks[22].identified']
+        CalTranP3 = dataplot3[1]['self.Blocks[21].identified']
+        CalTranQ3 = dataplot3[1]['self.Blocks[22].identified']
         
         Ptotal = CalTranP1 + CalTranP2 + CalTranP3
         Qtotal = CalTranQ1 + CalTranQ2 + CalTranQ3
@@ -134,7 +134,7 @@ for wind_num in WindFarmNum:
         }
         data_dict2 = {'Agat':data_dict}
         
-        directory = r"C:\Users\29639\Desktop\研二下研究\paper4电工\code\PythonData"
+        directory = r"G:\paper4\PythonData"
         fault_name = f"\Fault_{wind_num}_{square_num}.mat"
         Datapath = directory + fault_name
                 
