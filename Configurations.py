@@ -1,163 +1,120 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct 13 13:19:21 2023
+Created on Sat Oct 28 14:43:20 2023
 
 @author: Gregory_Guo
 """
 
 """
-DFIG Configuration files
+DFIG_HVDC Configuration files
 state order specify the order of the equation
 """
 
-# inputs: UD UQ Wind
-sys_inputs = ['UD_averaged', 'UQ_averaged', 'Wind_averaged']
-sys_outputs = ['UD_averaged', 'UQ_averaged', 'Wind_averaged']
-# Outputs: 
+sys_inputs = ['S1UD', 'S1UQ', 'S2UD', 'S2UQ']
+sys_outputs = ['P_right', 'Qright', 'P_left', 'Qleft']
 
 
-# Block1 --> Asynchronous Machine
-states1 = ['Ird_averaged', 'Irq_averaged', 'Isd_averaged', 'Isq_averaged']
-inputs1 = ['Urd_averaged', 'Urq_averaged', 'Usd_averaged', 'Usq_averaged']
+# Block1 --> Electrical left
+states1 = ['Icd1', 'Icq1']
+inputs1 = ['Usd1', 'Usq1', 'Ucd1', 'Ucq1']
 constraints_assign1 = []
 constraints_combi1 = []
 bias1 = False
 Type1 = 'B'
 Ident1 = 'L'
 
-# Block2 --> Grid Filter
-states2 = ['pigd_averaged', 'pigq_averaged']
-inputs2 = ['Usdg_averaged', 'Usqg_averaged', 'Vrefd_averaged', 'Vrefq_averaged']     
+# Block2 --> Electrical right
+states2 = ['Icd2', 'Icq2']
+inputs2 = ['Usd2', 'Usq2', 'Ucd2', 'Ucq2']     
 constraints_assign2 = []
 constraints_combi2 = []
 bias2 = False
 Type2 = 'B'
 Ident2 = 'L'
 
-# Block3 --> Swing Equations
-states3 = ['pwm_averaged']
-inputs3 = ['Te_averaged', 'TL_averaged']
+# Block3 --> Capacitor left
+states3 = ['pVdc1']
+inputs3 = ['P_left', 'id1']
 constraints_assign3 = []
 constraints_combi3 = []
 bias3 = False
 Type3 = 'B'
 Ident3 = 'L'
 
-# Block4 --> Capacitor
-states4 = ['pVdc_averaged']
-inputs4 = ['Prsc_averaged', 'Pgsc_averaged']     
-constraints_assign4 = [('pVdc_averaged','x0_dot',1),
-                        ('pVdc_averaged','x0x0_dot',-1),
-                        ('pVdc_averaged','x0',0),
-                        ('pVdc_averaged','u0_dot',0),
-                        ('pVdc_averaged','u1_dot',0),
-                        ('pVdc_averaged','u0x0_dot',0),
-                        ('pVdc_averaged','u1x0_dot',0),
-                        ('pVdc_averaged','x0u1_dot',0)]
-constraints_combi4 = [('pVdc_averaged','u0','pVdc_averaged','u1', 0)]
-# constraints_assign4 = []
-# constraints_combi4 = []
+# Block4 --> Capacitor right
+states4 = ['pVdc2']
+inputs4 = ['P_right', 'id2']     
+constraints_assign4 = []
+constraints_combi4 = []
 bias4 = True
 Type4 = 'B'
-# Ident4 = 'L'
-Ident4 = 'I'
+Ident4 = 'L'
 
-# Block5 --> RSC
-states5 = ['pPhira_averaged', 'pPhirb_averaged', 'pPhirc_averaged']
-inputs5 = ['Ird_averaged', 'Irq_averaged', 'pwm_averaged', 'Usdg_averaged', 'Usqg_averaged']
+# Block5 --> Transimission line
+states5 = ['pId_dc']
+inputs5 = ['Vleft', 'Vright']
 constraints_assign5 = []
 constraints_combi5 = []
-bias5 = True
+bias5 = False
 Type5 = 'B'
 Ident5 = 'L'
 
-# Block6 --> GSC
-states6 = ['pPhiga_averaged', 'pPhigb_averaged', 'pPhigc_averaged']
-inputs6 = ['pVdc_averaged', 'pigd_averaged', 'pigq_averaged']
+# Block6 --> Control left
+states6 = ['pPhia1', 'pPhib1', 'pPhic1', 'pPhid1']
+inputs6 = ['Icd1', 'Icq1', 'pVdc1', 'Qleft']
 constraints_assign6 = []
 constraints_combi6 = []
 bias6 = True
 Type6 = 'B'
 Ident6 = 'L'
 
-# Block7 --> Axis
-states7 = ['pTurbine_w_averaged', 'pshaft_w_averaged']
-inputs7 = ['pwm_averaged', 'Wind_averaged']
+# Block7 --> Control right
+states7 = ['pPhia2', 'pPhib2', 'pPhic2', 'pPhid2']
+inputs7 = ['Icd2', 'Icq2', 'Pright', 'Qright']
 constraints_assign7 = []
 constraints_combi7 = []
-bias7 = False
+bias7 = True
 Type7 = 'B'
 Ident7 = 'L'
 
-# Block8 --> PLL_rsc
-states8 = ['rtheta_pll_averaged', 'pRPLL_PI_averaged']
-inputs8 = ['UD_averaged', 'UQ_averaged']
-# constraints_assign8 = [('rtheta_pll_averaged','u0',0),
-#                         ('rtheta_pll_averaged','u1',0),
-#                         ('rtheta_pll_averaged','x1',1),
-#                         ('rtheta_pll_averaged','x0 sin(1 x0)',0),
-#                         ('rtheta_pll_averaged','x0 cos(1 x0)',0),
-#                         ('rtheta_pll_averaged','x0 sin(1 x1)',0),
-#                         ('rtheta_pll_averaged','x0 cos(1 x1)',0),
-#                         ('pRPLL_PI_averaged','x0',0),
-#                         ('pRPLL_PI_averaged','u0',0),
-#                         ('pRPLL_PI_averaged','u1',0),
-#                         ('pRPLL_PI_averaged','x0 sin(1 x0)',0),
-#                         ('pRPLL_PI_averaged','x0 cos(1 x0)',0),
-#                         ('pRPLL_PI_averaged','x0 sin(1 x1)',0),
-#                         ('pRPLL_PI_averaged','x0 cos(1 x1)',0),
-#   ]
-constraints_assign8 = [('rtheta_pll_averaged','u0',0),
-                        ('rtheta_pll_averaged','u1',0),
-                        ('rtheta_pll_averaged','x1',1),
-                        ('rtheta_pll_averaged','x1 sin(1 x0)',0),
-                        ('rtheta_pll_averaged','x1 cos(1 x0)',0),
-                        ('pRPLL_PI_averaged','x1',0),
-                        ('pRPLL_PI_averaged','u0',0),
-                        ('pRPLL_PI_averaged','u1',0),
-                        ('pRPLL_PI_averaged','x1 sin(1 x0)',0),
-                        ('pRPLL_PI_averaged','x1 cos(1 x0)',0)]
-# constraints_assign8 = []
+# Block8 --> PLL_left
+states8 = ['pLPLL_PI', 'pLPLL_THETA']
+inputs8 = ['Usd1', 'Usq1']
+constraints_assign8 = []
 constraints_combi8 = []
-# constraints_combi8 = [('rtheta_pll_averaged','u0 cos(1 x0)','rtheta_pll_averaged','u1 sin(1 x0)', 0),
-#                       ('pRPLL_PI_averaged','u0 cos(1 x0)','pRPLL_PI_averaged','u1 sin(1 x0)', 0)]
 bias8 = True
 Type8 = 'B'
-# Ident8 = 'L'
-Ident8 = 'S'
+Ident8 = 'L'
 
-# Block9 --> PLL_gsc
-states9 = ['pGPLL_PI_averaged', 'gtheta_pll_averaged']
-inputs9 = ['UD_averaged', 'UQ_averaged'] 
+# Block9 --> PLL_right
+states9 = ['pHRPLL_PI', 'pRPLL_THETA']
+inputs9 = ['Usd2', 'Usq2'] 
 constraints_assign9 = []
 constraints_combi9 = []
 bias9 = False
 Type9 = 'B'
-# Ident9 = 'L'
-Ident9 = 'S'
-
-
+Ident9 = 'L'
 
 # for transmission line
 # DFIG_C
-states10 = ['UD_averaged', 'UQ_averaged']
-inputs10 = ['DFIG_Ix_averaged', 'DFIG_Iy_averaged', 'DFIG_Lx_averaged', 'DFIG_Ly_averaged']
+states10 = ['UD', 'UQ']
+inputs10 = ['DFIG_Ix', 'DFIG_Iy', 'DFIG_Lx', 'DFIG_Ly']
 constraints_assign10 = []
 constraints_combi10 = []
 bias10 = False
 Type10 = 'B'
 Ident10 = 'L'
 # DFIG_L
-states11 = ['DFIG_Lx_averaged', 'DFIG_Ly_averaged']
-inputs11 = ['UD_averaged', 'UQ_averaged', 'PCCUx_', 'PCCUy_']
+states11 = ['DFIG_Lx', 'DFIG_Ly']
+inputs11 = ['UD', 'UQ', 'PCCUx', 'PCCUy']
 constraints_assign11 = []
 constraints_combi11 = []
 bias11 = False
 Type11 = 'B'
 Ident11 = 'L'
-# PCC1
-states12 = ['PCCUx_', 'PCCUy_']
-inputs12 = ['DFIG_Lx_total', 'DFIG_Ly_total', 'infL_x', 'infL_y']  #, 'HVDC_Lx1', 'HVDC_Ly1'
+# PCC
+states12 = ['PCCUx', 'PCCUy']
+inputs12 = ['DFIG_Lx', 'DFIG_Ly', 'HVDC_Lx1', 'HVDC_Ly1', 'infL_x', 'infL_y']
 constraints_assign12 = []
 constraints_combi12 = []
 bias12 = False
@@ -165,105 +122,263 @@ Type12 = 'B'
 Ident12 = 'L'
 # inf_L
 states13 = ['infL_x', 'infL_y']
-inputs13 = ['S1UD_', 'S1UQ_', 'PCCUx_', 'PCCUy_']
+inputs13 = ['S1UD', 'S1UQ', 'PCCUx', 'PCCUy']
 constraints_assign13 = []
 constraints_combi13 = []
 bias13 = False
 Type13 = 'B'
 Ident13 = 'L'
-
-
-# Algebraic --> TL
-states14 = ['pTurbine_w_averaged', 'pshaft_w_averaged', 'pwm_averaged']
-dot14_x = ['TL_averaged']
+# HVDC_C
+states14 = ['UD2', 'UQ2']
+inputs14 = ['HVDC_Lx2', 'HVDC_Ly2', 'HVDC_Lx', 'HVDC_Ly']
 constraints_assign14 = []
 constraints_combi14 = []
 bias14 = False
-Type14 = 'A'
-# Ident14 = 'L'
+Type14 = 'B'
 Ident14 = 'L'
-
-# Algebraic --> Te
-states15 = ['Ird_averaged', 'Irq_averaged', 'Isd_averaged', 'Isq_averaged']
-dot15_x = ['Te_averaged']
+# HVDC_L
+states15 = ['HVDC_Lx', 'HVDC_Ly']
+inputs15 = ['S2UD', 'S2UQ', 'UD2', 'UD2']
 constraints_assign15 = []
 constraints_combi15 = []
 bias15 = False
-Type15 = 'A'
+Type15 = 'B'
 Ident15 = 'L'
-# Ident15 = 'P2'
 
-# Algebraic --> Prsc
-states16 = ['Ird_averaged', 'Irq_averaged', 'Urd_averaged', 'Urq_averaged']
-dot16_x = ['Prsc_averaged']
+
+# DFIG
+# Block1 --> Asynchronous Machine
+states16 = ['Ird', 'Irq', 'Isd', 'Isq']
+inputs16 = ['Urd', 'Urq', 'Usd', 'Usq']
 constraints_assign16 = []
 constraints_combi16 = []
 bias16 = False
-Type16 = 'A'
+Type16 = 'B'
 Ident16 = 'L'
-# Ident16 = 'P2'
 
-# Algebraic --> Pgsc
-states17 = ['pigd_averaged', 'pigq_averaged', 'Usdg_averaged', 'Usqg_averaged']
-dot17_x = ['Pgsc_averaged']
+# Block2 --> Grid Filter
+states17 = ['pigd', 'pigq']
+inputs17 = ['Usdg', 'Usqg', 'Vrefd', 'Vrefq']     
 constraints_assign17 = []
 constraints_combi17 = []
 bias17 = False
-Type17 = 'A'
+Type17 = 'B'
 Ident17 = 'L'
-# Ident17 = 'P2'
 
-# Algebraic --> Usd, Usq
-states18 = ['UD_averaged', 'UQ_averaged', 'rtheta_pll_averaged']
-dot18_x = ['Usd_averaged', 'Usq_averaged']
+# Block3 --> Swing Equations
+states18 = ['pwm']
+inputs18 = ['Te', 'TL']
 constraints_assign18 = []
 constraints_combi18 = []
-bias18 = True
-Type18 = 'A'
+bias18 = False
+Type18 = 'B'
 Ident18 = 'L'
 
-# Algebraic --> Usdg, Usqg
-states19 = ['UD_averaged', 'UQ_averaged', 'gtheta_pll_averaged']
-dot19_x = ['Usdg_averaged', 'Usqg_averaged']
+# Block4 --> Capacitor
+states19 = ['pVdc']
+inputs19 = ['Prsc', 'Pgsc']     
 constraints_assign19 = []
 constraints_combi19 = []
-bias19 = False
-Type19 = 'A'
+bias19 = True
+Type19 = 'B'
 Ident19 = 'L'
 
-# Algebraic --> Vrefd, Vrefq
-states20 = ['pigd_averaged', 'pigq_averaged', 'pPhiga_averaged', 'pPhigb_averaged', 'pPhigc_averaged', 'pVdc_averaged', 'Usdg_averaged', 'Usqg_averaged']
-dot20_x = ['Vrefd_averaged', 'Vrefq_averaged']
+# Block5 --> RSC
+states20 = ['pPhira', 'pPhirb', 'pPhirc']
+inputs20 = ['Ird', 'Irq', 'pwm']
 constraints_assign20 = []
 constraints_combi20 = []
 bias20 = True
-Type20 = 'A'
+Type20 = 'B'
 Ident20 = 'L'
 
-# Algebraic --> Vrefq
-states21 = ['Ird_averaged', 'Irq_averaged', 'pPhira_averaged', 'pPhirb_averaged', 'pPhirc_averaged', 'pwm_averaged']
-dot21_x = ['Urd_averaged', 'Urq_averaged']
+# Block6 --> GSC
+states21 = ['pPhiga', 'pPhigb', 'pPhigc']
+inputs21 = ['pVdc', 'pigd', 'pigq']
 constraints_assign21 = []
 constraints_combi21 = []
 bias21 = True
-Type21 = 'A'
+Type21 = 'B'
 Ident21 = 'L'
 
-# Algebraic --> P_total
-states22 = ['DFIG_Lx_total', 'DFIG_Ly_total', 'PCCUx_', 'PCCUy_']
-dot22_x = ['Ptotal']
+# Block7 --> Axis
+states22 = ['pTurbine_w', 'pshaft_w']
+inputs22 = ['pwm', 'Wind']
 constraints_assign22 = []
 constraints_combi22 = []
-bias22 = True
-Type22 = 'A'
+bias22 = False
+Type22 = 'B'
 Ident22 = 'L'
 
-# Algebraic --> P_total
-states23 = ['DFIG_Lx_total', 'DFIG_Ly_total', 'PCCUx_', 'PCCUy_']
-dot23_x = ['Qtotal']
+# Block8 --> PLL_rsc
+states23 = ['pRPLL_PI', 'ptheta_pll']
+inputs23 = ['UD', 'UQ']
 constraints_assign23 = []
 constraints_combi23 = []
 bias23 = True
-Type23 = 'A'
+Type23 = 'B'
 Ident23 = 'L'
 
+# Block9 --> PLL_gsc
+states24 = ['pGPLL_PI', 'gtheta_pll']
+inputs24 = ['UD', 'UQ'] 
+constraints_assign24 = []
+constraints_combi24 = []
+bias24 = False
+Type24 = 'B'
+Ident24 = 'L'
+
+# Algebraic --> TL
+states25 = ['pTurbine_w', 'pshaft_w', 'pwm']
+dot25_x = ['TL']
+constraints_assign25 = []
+constraints_combi25 = []
+bias25 = False
+Type25 = 'A'
+Ident25 = 'L'
+
+# Algebraic --> Te
+states26 = ['Ird', 'Irq', 'Isd', 'Isq']
+dot26_x = ['Te']
+constraints_assign26 = []
+constraints_combi26 = []
+bias26 = False
+Type26 = 'A'
+Ident26 = 'L'
+
+# Algebraic --> Prsc
+states27 = ['Ird', 'Irq', 'Urd', 'Urq']
+dot27_x = ['Prsc']
+constraints_assign27 = []
+constraints_combi27 = []
+bias27 = False
+Type27 = 'A'
+Ident27 = 'L'
+
+# Algebraic --> Pgsc
+states28 = ['pigd', 'pigq', 'Usdg', 'Usqg']
+dot28_x = ['Pgsc']
+constraints_assign28 = []
+constraints_combi28 = []
+bias28 = False
+Type28 = 'A'
+Ident28 = 'L'
+
+# Algebraic --> Usd, Usq
+states29 = ['UD', 'UQ', 'ptheta_pll']
+dot29_x = ['Usd', 'Usq']
+constraints_assign29 = []
+constraints_combi29 = []
+bias29 = True
+Type29 = 'A'
+Ident29 = 'L'
+
+# Algebraic --> Usdg, Usqg
+states30 = ['UD', 'UQ', 'gtheta_pll']
+dot30_x = ['Usdg', 'Usqg']
+constraints_assign30 = []
+constraints_combi30 = []
+bias30 = False
+Type30 = 'A'
+Ident30 = 'L'
+
+# Algebraic --> Vrefd, Vrefq
+states31= ['pigd', 'pigq', 'pPhiga', 'pPhigb', 'pPhigc', 'pVdc', 'Usdg', 'Usqg']
+dot31_x = ['Vrefd', 'Vrefq']
+constraints_assign31 = []
+constraints_combi31 = []
+bias31 = True
+Type31 = 'A'
+Ident31 = 'L'
+
+# Algebraic --> Vrefq
+states32= ['Ird', 'Irq', 'pPhira', 'pPhirb', 'pPhirc', 'pwm']
+dot32_x = ['Urd', 'Urq']
+constraints_assign32 = []
+constraints_combi32 = []
+bias32 = True
+Type32 = 'A'
+Ident32 = 'L'
+
+
+# HVDC
+# Algebraic --> P_right
+states33 = ['Icd2', 'Icq2', 'Ucd2', 'Ucq2']
+dot33_x = ['P_right']
+constraints_assign33 = []
+constraints_combi33 = []
+bias33 = False
+Type33 = 'A'
+Ident33 = 'L'
+
+# Algebraic --> Pright
+states34 = ['Icd2', 'Icq2', 'Usd2', 'Usq2']
+dot34_x = ['Pright']
+constraints_assign34 = []
+constraints_combi34 = []
+bias34 = False
+Type34 = 'A'
+Ident34 = 'L'
+
+# Algebraic --> Q_right
+states35 = ['Icd2', 'Icq2', 'Usd2', 'Usq2']
+dot35_x = ['Qright']
+constraints_assign35 = []
+constraints_combi35 = []
+bias35 = False
+Type35 = 'A'
+Ident35 = 'L'
+
+# Algebraic --> P_left
+states36 = ['Icd1', 'Icq1', 'Ucd1', 'Ucq1']
+dot36_x = ['P_left']
+constraints_assign36 = []
+constraints_combi36 = []
+bias36 = False
+Type36 = 'A'
+Ident36 = 'L'
+
+# Algebraic --> Q_left
+states37 = ['Icd1', 'Icq1', 'Usd1', 'Usq1']
+dot37_x = ['Qleft']
+constraints_assign37 = []
+constraints_combi37 = []
+bias37 = False
+Type37 = 'A'
+Ident37 = 'L'
+
+# Algebraic --> Usdq1_pll
+states38 = ['UD1', 'UQ1', 'pLPLL_THETA']
+dot38_x = ['Usd1', 'Usq1']
+constraints_assign38 = []
+constraints_combi38 = []
+bias38 = True
+Type38 = 'A'
+Ident38 = 'L'
+
+# Algebraic --> Usdq2_pll
+states39 = ['UD2', 'UQ2', 'pRPLL_THETA']
+dot39_x = ['Usd2', 'Usq2']
+constraints_assign39 = []
+constraints_combi39 = []
+bias39 = False
+Type39 = 'A'
+Ident39 = 'L'
+
+# Algebraic --> Ucdq1_ref
+states40 = ['Icd1', 'Icq1', 'pPhia1', 'pPhib1', 'pPhic1', 'pPhid1', 'pVdc1', 'Qleft', 'Usd1', 'Usq1']
+dot40_x = ['Ucd1', 'Ucq1']
+constraints_assign40 = []
+constraints_combi40 = []
+bias40 = True
+Type40 = 'A'
+Ident40 = 'L'
+
+# Algebraic --> Ucdq2_ref
+states41 = ['Icd2', 'Icq2', 'pPhia2', 'pPhib2', 'pPhic2', 'pPhid2', 'Pright', 'Qright', 'Usd2', 'Usq2']
+dot41_x = ['Ucd2', 'Ucq2']
+constraints_assign41 = []
+constraints_combi41 = []
+bias41 = True
+Type41 = 'A'
+Ident41 = 'L'

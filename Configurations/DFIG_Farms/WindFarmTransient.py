@@ -32,8 +32,8 @@ Algebra_num = 10
 # WindFarmNum = [5,15,25]
 # Square = [5,10,15,20,25,30]
 
-WindFarmNum = [25]
-Square = [30]
+WindFarmNum = [5]
+Square = [20]
 
 # file root check
 directory = r"G:\paper4\PythonData"
